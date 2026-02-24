@@ -2,7 +2,6 @@ name: Project Submission Pipeline
 
 on:
   pull_request:
-    branches: ['*/pokedex-pull-request']
 
 jobs:
   extract-pr-info:
@@ -87,7 +86,6 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    needs: [gitignore-check]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -107,7 +105,7 @@ jobs:
   format:
     name: Format Check
     runs-on: ubuntu-latest
-    needs: [gitignore-check]
+    needs: lint
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -127,7 +125,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
-    needs: [gitignore-check]
+    needs: format
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -156,7 +154,7 @@ jobs:
   build:
     name: Build Check
     runs-on: ubuntu-latest
-    needs: [gitignore-check, lint, format, test]
+    needs: test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
