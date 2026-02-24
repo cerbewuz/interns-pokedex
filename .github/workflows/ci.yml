@@ -15,44 +15,44 @@ jobs:
         run: |
           echo "Extracting information from Pull Request body..."
           echo ""
-          
+
           # Extract Full Name
           FULL_NAME=$(echo "$PR_BODY" | grep -oP '(?<=Full Name:\s).*' | head -1 | xargs)
-          
+
           # Extract Umindanao Email
           UMINDANAO_EMAIL=$(echo "$PR_BODY" | grep -oP '(?<=Umindanao Email:\s).*' | head -1 | xargs)
-          
+
           # Validate Full Name
           if [ -z "$FULL_NAME" ]; then
             echo "::error::Full Name not found in PR body. Please ensure your PR body contains 'Full Name: Your Name'"
             exit 1
           fi
-          
+
           # Validate Umindanao Email exists
           if [ -z "$UMINDANAO_EMAIL" ]; then
             echo "::error::Umindanao Email not found in PR body. Please ensure your PR body contains 'Umindanao Email: your.email@umindanao.edu.ph'"
             exit 1
           fi
-          
+
           # Validate Umindanao Email format: <initial>.<lastname>.<6-digit-id>@umindanao.edu.ph
           EMAIL_REGEX='^[a-zA-Z]\.[a-zA-Z]+\.[0-9]{6}@umindanao\.edu\.ph$'
           if ! echo "$UMINDANAO_EMAIL" | grep -qE "$EMAIL_REGEX"; then
             echo "::error::Invalid Umindanao Email format. Expected format: <initial of firstname>.<lastname>.<6 digit id number>@umindanao.edu.ph (e.g., j.delacruz.123456@umindanao.edu.ph)"
             exit 1
           fi
-          
+
           # Extract last name from email (second part between dots)
           LAST_NAME=$(echo "$UMINDANAO_EMAIL" | cut -d'.' -f2)
-          
+
           # Get the branch name and validate it contains the last name
           BRANCH_NAME="${{ github.head_ref }}"
           EXPECTED_BRANCH="${LAST_NAME}/pokedex-pull-request"
-          
+
           if [ "$BRANCH_NAME" != "$EXPECTED_BRANCH" ]; then
             echo "::error::Branch name mismatch! Expected branch: '$EXPECTED_BRANCH' but got: '$BRANCH_NAME'. Your branch should follow the format: <lastname>/pokedex-pull-request"
             exit 1
           fi
-          
+
           echo "=========================================="
           echo "Pull Request Information"
           echo "=========================================="
